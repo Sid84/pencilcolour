@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import {readFile,writeFile,mkdir} from 'node:fs/promises';
 import path from 'node:path';
+import {createHash} from 'node:crypto';
 import {fileURLToPath} from 'node:url';
 const app=express();app.use(cors());app.use(express.json());
 const seedFile=new URL('./data/store.json',import.meta.url);
@@ -29,8 +30,8 @@ app.post('/api/tags/:id/publish',async(req,res)=>{
  const t=db.tags.find(x=>x.id===req.params.id);if(!t)return error(res,'Tag not found',404);
  const p=db.products.find(x=>x.id===t.productId);if(!p)return error(res,'Assigned product not found',404);
  if(t.status==='offline')return error(res,'Tag offline: cannot publish',409);
- t.published=snapshot(p);t.status='synced';t.updatedAt=new Date().toISOString();
- db.events.unshift({at:t.updatedAt,type:'publish',message:`Published ${p.sku} to ${t.id}`});db.events=db.events.slice(0,50);
+ t.status='pending';
+ db.events.unshift({at:new Date().toISOString(),type:'publish',message:`Queued ${p.sku} for ${t.id}`});db.events=db.events.slice(0,50);
  await save();res.json(db);
 });
 app.post('/api/tags/:id/connectivity',async(req,res)=>{
@@ -57,9 +58,7 @@ app.get('/api/gateway/jobs',gatewayAuth,(req,res)=>{
   const p=db.products.find(x=>x.id===t.productId);
   if(!p)continue;
   const version=JSON.stringify(snapshot(p));
-  const prior=gatewayJobs.get(t.id);
-  if(prior?.version===version && prior.state==='delivered')continue;
-  const job={id:`${t.id}:${Buffer.from(version).toString('base64url').slice(0,32)}`,tagId:t.id,product:snapshot(p),version};
+  const job={id:`${t.id}:${createHash('sha256').update(version).digest('base64url')}`,tagId:t.id,product:snapshot(p),version};
   gatewayJobs.set(t.id,{...job,state:'pending'});jobs.push({id:job.id,tagId:job.tagId,product:job.product});
  }
  res.json({jobs});
@@ -67,10 +66,14 @@ app.get('/api/gateway/jobs',gatewayAuth,(req,res)=>{
 app.post('/api/gateway/jobs/:tagId/ack',gatewayAuth,async(req,res)=>{
  const job=gatewayJobs.get(req.params.tagId);
  if(!job||job.id!==req.body.jobId)return error(res,'Unknown or stale job',409);
- if(!['delivered','failed'].includes(req.body.status))return error(res,'Invalid status');
+ if(!['delivered','failed','ble_test'].includes(req.body.status))return error(res,'Invalid status');
  const tag=db.tags.find(t=>t.id===req.params.tagId);
  if(!tag)return error(res,'Tag not found',404);
- if(req.body.status==='delivered'){
+ const product=db.products.find(p=>p.id===tag.productId);
+ if(tag.status!=='pending'||!product||JSON.stringify(snapshot(product))!==job.version)return error(res,'Unknown or stale job',409);
+ if(req.body.status==='ble_test'){
+  tag.bleTest={jobId:job.id,at:new Date().toISOString(),result:'acknowledged'};
+ }else if(req.body.status==='delivered'){
   tag.published=job.product;tag.status='synced';tag.updatedAt=new Date().toISOString();
   job.state='delivered';
  }else{tag.status='pending';job.state='failed'}
