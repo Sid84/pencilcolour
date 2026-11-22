@@ -1,0 +1,117 @@
+{
+  "products": [
+    {
+      "id": "p1",
+      "sku": "MILK-001",
+      "name": "Organic Whole Milk",
+      "size": "1 L",
+      "price": 4.5,
+      "previousPrice": 4.95,
+      "category": "Dairy"
+    },
+    {
+      "id": "p2",
+      "sku": "BREAD-002",
+      "name": "Sourdough Bread",
+      "size": "700 g",
+      "price": 7.2,
+      "previousPrice": null,
+      "category": "Bakery"
+    },
+    {
+      "id": "p3",
+      "sku": "EGGS-003",
+      "name": "Free Range Eggs",
+      "size": "12 pack",
+      "price": 8.5,
+      "previousPrice": 9.2,
+      "category": "Dairy"
+    },
+    {
+      "id": "p4",
+      "sku": "COFFEE-004",
+      "name": "Arabica Coffee Beans",
+      "size": "500 g",
+      "price": 16.99,
+      "previousPrice": null,
+      "category": "Pantry"
+    },
+    {
+      "id": "p5",
+      "sku": "APPLE-005",
+      "name": "Pink Lady Apples",
+      "size": "1 kg",
+      "price": 5.9,
+      "previousPrice": 6.5,
+      "category": "Produce"
+    },
+    {
+      "id": "p6",
+      "sku": "RICE-006",
+      "name": "Jasmine Rice",
+      "size": "2 kg",
+      "price": 6.75,
+      "previousPrice": null,
+      "category": "Pantry"
+    }
+  ],
+  "tags": [
+    {
+      "id": "ESL-001",
+      "productId": "p1",
+      "status": "synced",
+      "battery": 93,
+      "published": {
+        "name": "Organic Whole Milk",
+        "size": "1 L",
+        "price": 4.5,
+        "previousPrice": 4.95,
+        "sku": "MILK-001"
+      },
+      "updatedAt": null
+    },
+    {
+      "id": "ESL-002",
+      "productId": "p2",
+      "status": "synced",
+      "battery": 81,
+      "published": {
+        "name": "Sourdough Bread",
+        "size": "700 g",
+        "price": 7.2,
+        "previousPrice": null,
+        "sku": "BREAD-002"
+      },
+      "updatedAt": null
+    },
+    {
+      "id": "ESL-003",
+      "productId": "p3",
+      "status": "synced",
+      "battery": 68,
+      "published": {
+        "name": "Free Range Eggs",
+        "size": "12 pack",
+        "price": 8.5,
+        "previousPrice": 9.2,
+        "sku": "EGGS-003"
+      },
+      "updatedAt": null
+    },
+    {
+      "id": "ESL-004",
+      "productId": "p4",
+      "status": "synced",
+      "battery": 97,
+      "published": {
+        "name": "Arabica Coffee Beans",
+        "size": "500 g",
+        "price": 16.99,
+        "previousPrice": null,
+        "sku": "COFFEE-004"
+      },
+      "updatedAt": null
+    }
+  ],
+  "events": []
+}
